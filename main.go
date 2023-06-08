@@ -1,17 +1,13 @@
 package main
 
 import (
-	"coininfos/server/router"
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html"
-	"github.com/joho/godotenv"
 )
+
+var test string
 
 func main() {
 	//template render engine
@@ -21,39 +17,28 @@ func main() {
 		Views: engine, //set as render engine
 	})
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+  app.Use(func(c *fiber.Ctx) error {
+    fmt.Println(test)
+    return c.Next()
+  })
+  
+  app.Static("/", "./dist")
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Render("index", fiber.Map{
+    "Test": "test",
+  }); })
 
-	// env := os.Getenv("APP_ENV")
-	port := os.Getenv("PORT")
+  app.Post("/", func(c *fiber.Ctx) error {
+    var body struct {
+      Name string
+    } 
+    if err := c.BodyParser(&body); err != nil {
+      return err
+    }
+    test = body.Name
+		return c.Render("index", nil); 
+  })
 
-	fmt.Println(port)
-
-	if port == "" {
-		port = "8080"
-	}
-
-	app.Use(logger.New())
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "*",
-		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
-		AllowMethods:     "GET, HEAD, PUT, PATCH, POST, DELETE",
-		AllowCredentials: true,
-	}))
-
-	// swagger 등록
-	// app.Get("/swagger/*", swagger.Handler)
-
-	router.SetupRoutes(app)
-
-	app.Static("/", "./dist")
-	app.Get("/", mainPage)
-
-	app.Listen(":" + port)
+	app.Listen(":8080")
 }
 
-func mainPage(c *fiber.Ctx) error {
-	return c.Render("index", nil)
-}

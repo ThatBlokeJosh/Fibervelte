@@ -1,51 +1,33 @@
 <script>
-  // @ts-nocheck
-  import { onDestroy } from "svelte";
-  import Router from "svelte-spa-router";
-  import { QueryClient, QueryClientProvider } from "@sveltestack/svelte-query";
-
-  import { routes } from "./routes";
-  import { common } from "@/stores/common";
-  import { layout } from "@/stores/layout";
-  import Navbar from "./lib/layout/common/Navbar.svelte";
-  import Header from "./lib/layout/common/Header.svelte";
-  import Footer from "./lib/layout/common/Footer.svelte";
-  import Loading from "./lib/layout/common/Loading.svelte";
-
-  import "./index.css";
-
-  let isLoading = false;
-  let darkValue = true;
-
-  const queryClient = new QueryClient();
-
-  const loadingSub = common.subscribe((value) => {
-    isLoading = value.isLoading;
-  });
-
-  const layoutSub = layout.subscribe((value) => {
-    darkValue = value.darkMode;
-  });
-
-  onDestroy(loadingSub);
-  onDestroy(layoutSub);
 </script>
 
-<QueryClientProvider client={queryClient}>
-  <div
-    data-theme={darkValue ? "dark" : "corporate"}
-    class={darkValue ? "dark font-sans antialiased" : "font-sans antialiased"}
-  >
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-      <Navbar />
-      <Header />
-      <main>
-        <Router {routes} />
-      </main>
-      <Footer />
-      {#if isLoading}
-        <Loading />
-      {/if}
-    </div>
+<main>
+  <div>
   </div>
-</QueryClientProvider>
+  <h1>Fibervelte</h1>
+  <div class="card">
+  </div>
+      <form action="/" method="POST" class="form__group field">
+          <input type="input" class="form__field" placeholder="Name" name="name" id='name' required />
+    </form>
+</main>
+
+<style>
+  .form__group {
+    position: relative;
+    width: 100%;
+  }
+
+  .form__field {
+    font-family: inherit;
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #9b9b9b;
+    outline: 0;
+    font-size: 1.3rem;
+    color: #fff;
+    padding: 7px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+  }
+</style>
